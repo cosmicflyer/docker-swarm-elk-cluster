@@ -42,7 +42,7 @@ services:
       - source: elastic_certificate
         target: /usr/share/elasticsearch/config/elastic-certificates.p12
     volumes:
-      - es2-data:/usr/share/elasticsearch/data
+      - es02-data:/usr/share/elasticsearch/data
     networks:
       - elastic-backend
     deploy:
