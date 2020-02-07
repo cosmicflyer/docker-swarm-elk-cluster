@@ -25,12 +25,12 @@
     kibana: http://node-ip:5601/
 ```
 
-5. Stop
+6. Stop
 ```
     make down
 ```
 
-6. Check cluster and indexes
+7. Check cluster and indexes
 ```
     curl -sb -X GET "http://user:password@node-ip:9200/_cat/health?v"
     curl -sb -X GET "http://user:password@node-ip:9200/_cat/nodes?v"
@@ -38,7 +38,7 @@
 
 ```
 
-7. If you need copy indexes from other elastic servers
+8. If you need copy indexes from other elastic servers
 
   - Change user/password/ip/port of old and new clusters in migrate-index.sh (string 5, 6, 15, 16)
   - Add "reindex.remote.whitelist: old_server_ip:old_server:port" to configs/elasticsearch.yml
