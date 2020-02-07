@@ -18,11 +18,13 @@ services:
       - source: elastic_certificate
         target: /usr/share/elasticsearch/config/elastic-certificates.p12
     volumes:
-      - data01:/usr/share/elasticsearch/data
+      - es01-data:/usr/share/elasticsearch/data
     networks:
       - elastic-backend
-#    ports:
-#      - 9201:9200
+    deploy:
+      mode: global
+      placement:
+        constraints: [node.labels.elastic01 == true]
 
   es02:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
@@ -40,9 +42,13 @@ services:
       - source: elastic_certificate
         target: /usr/share/elasticsearch/config/elastic-certificates.p12
     volumes:
-      - data02:/usr/share/elasticsearch/data
+      - es2-data:/usr/share/elasticsearch/data
     networks:
       - elastic-backend
+    deploy:
+      mode: global
+      placement:
+        constraints: [node.labels.elastic02 == true]
 
   es03:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
@@ -60,11 +66,15 @@ services:
       - source: elastic_certificate
         target: /usr/share/elasticsearch/config/elastic-certificates.p12
     volumes:
-      - data03:/usr/share/elasticsearch/data
+      - es03-data:/usr/share/elasticsearch/data
     networks:
       - elastic-backend
+    deploy:
+      mode: global
+      placement:
+        constraints: [node.labels.elastic03 == true]
 
-  nginx-elastic:
+  es-nginx:
     image: nginx:1.17-alpine
     ports:
       - 9200:9200
@@ -92,11 +102,11 @@ services:
       mode: global
 
 volumes:
-  data01:
+  es01-data:
     driver: local
-  data02:
+  es02-data:
     driver: local
-  data03:
+  es03-data:
     driver: local
 
 configs:
