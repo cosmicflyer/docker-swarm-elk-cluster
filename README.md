@@ -41,7 +41,7 @@
 8. If you need copy indexes from other elastic servers
 
   - Change user/password/ip/port of old and new clusters in migrate-index.sh (string 5, 6, 15, 16)
-  - Add "reindex.remote.whitelist: old_server_ip:old_server:port" to configs/elasticsearch.yml
+  - Add "reindex.remote.whitelist: old_server_ip:old_server_port" to configs/elasticsearch.yml
   - Run 
     ```
     make down
