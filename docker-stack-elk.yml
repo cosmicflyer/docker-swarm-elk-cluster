@@ -1,0 +1,116 @@
+version: '3.3'
+
+services:
+
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+    environment:
+      - node.name=es01
+      - cluster.name=docker-cluster
+      - discovery.seed_hosts=es02,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - ELASTIC_PASSWORD=elastic
+    configs:
+      - source: elastic_config
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
+      - source: elastic_certificate
+        target: /usr/share/elasticsearch/config/elastic-certificates.p12
+    volumes:
+      - data01:/usr/share/elasticsearch/data
+    networks:
+      - elastic-backend
+#    ports:
+#      - 9201:9200
+
+  es02:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+    environment:
+      - node.name=es02
+      - cluster.name=docker-cluster
+      - discovery.seed_hosts=es01,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - ELASTIC_PASSWORD=elastic
+    configs:
+      - source: elastic_config
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
+      - source: elastic_certificate
+        target: /usr/share/elasticsearch/config/elastic-certificates.p12
+    volumes:
+      - data02:/usr/share/elasticsearch/data
+    networks:
+      - elastic-backend
+
+  es03:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+    environment:
+      - node.name=es03
+      - cluster.name=docker-cluster
+      - discovery.seed_hosts=es01,es02
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - ELASTIC_PASSWORD=elastic
+    configs:
+      - source: elastic_config
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
+      - source: elastic_certificate
+        target: /usr/share/elasticsearch/config/elastic-certificates.p12
+    volumes:
+      - data03:/usr/share/elasticsearch/data
+    networks:
+      - elastic-backend
+
+  nginx-elastic:
+    image: nginx:1.17-alpine
+    ports:
+      - 9200:9200
+      - 9300:9300
+    configs:
+      - source: nginx_config
+        target: /etc/nginx/nginx.conf
+    networks:
+      - elastic-backend
+      - elastic-frontend
+    deploy:
+      mode: global
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.2.0
+    ports:
+      - 5601:5601
+    configs:
+      - source: kibana_config
+        target: /usr/share/kibana/config/kibana.yml
+    networks:
+      - elastic-backend
+      - elastic-frontend
+    deploy:
+      mode: global
+
+volumes:
+  data01:
+    driver: local
+  data02:
+    driver: local
+  data03:
+    driver: local
+
+configs:
+  elastic_config:
+    file: ./configs/elasticsearch.yml
+  elastic_certificate:
+    file: ./configs/elastic-certificates.p12
+  kibana_config:
+    file: ./configs/kibana.yml
+  nginx_config:
+    file: ./configs/nginx.conf
+
+networks:
+  elastic-backend:
+    external: true
+  elastic-frontend:
+    external: true
